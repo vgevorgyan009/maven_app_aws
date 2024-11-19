@@ -1,35 +1,47 @@
+// jenkinsfile to build dynamicly incremented application versions and docker image versions
 pipeline {
   agent any
+  tools {
+      maven 'maven-3.9'
+  }
   stages {
-    stage("test") {
+    stage('increment version') {
         steps {
             script {
-                echo "testing the application..."
-                echo "executing pipeline for branch $BRANCH_NAME"
+                echo 'incrementing app version...'
+                sh 'mvn build-helper:parse-version versions:set \
+                -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
+                versions:commit'
+                def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                def version = matcher[0][1]
+                env.IMAGE_NAME = "$version-$BUILD_NUMBER"
             }
         }
     }
-    stage("build") {      
-      when {
-        expression {
-            BRANCH_NAME == "master"
-        }
-      }
-      steps {
-          script {
+    stage("build app") {      
+        steps {
+            script {
               echo "building the application..."
+              sh 'mvn clean package'
           }
       }
     }
-    stage("deploy") {
-      when {
-        expression {
-            BRANCH_NAME == "master"
-        }
-      }
+    stage('build image') {
         steps {
             script {
-                echo "building the application..."
+                echo 'building the docker image...'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                sh "docker build -t vgevorgyan009/demo-app:${IMAGE_NAME} ."
+                sh 'echo $PASS | docker login -u $USER --password-stdin'
+                sh "docker push vgevorgyan009/demo-app:${IMAGE_NAME}"
+    }
+            }
+        }
+    }
+    stage("deploy") {
+        steps {
+            script {
+                echo "deploying the application..."
             }
         } 
      } 
