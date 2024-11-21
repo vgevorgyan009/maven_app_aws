@@ -7,7 +7,7 @@ pipeline {
        maven 'maven-3.9'
   }
   environment {
-        IMAGE_NAME = 'vgevorgyan009/demo-app:java-maven-5.0'
+        IMAGE_NAME = 'vgevorgyan009/demo-app:java-maven-6.0'
   }
   stages {
     stage("init") {
