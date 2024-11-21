@@ -28,7 +28,7 @@ pipeline {
     stage("build image") {        
       steps {
           script {
-              gv.buildImage(env.IMAGE_NAME)
+              gv.buildImage()
           }
       }
     }
