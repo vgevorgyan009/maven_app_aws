@@ -3,7 +3,7 @@ services:
     java-maven-app:
       image: vgevorgyan009/demo-app:java-maven-6.0
       ports:
-        - 8080:4000
+        - 4000:8080
     postgres:
       image: postgres:15
       ports:
