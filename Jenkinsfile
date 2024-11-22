@@ -64,10 +64,10 @@ pipeline {
                     sh 'git branch'
                     sh 'git config --list'
 
-                    sh "git remote set-url origin https://${USER}:${PASS}@github.com/vgevorgyan009/maven_app.git"
+                    sh "git remote set-url origin https://${USER}:${PASS}@github.com/vgevorgyan009/maven_app_aws.git"
                     sh 'git add .'
                     sh 'git commit -m "ci: version bump"'
-                    sh 'git push origin HEAD:master'
+                    sh 'git push origin HEAD:docker-compose'
                 }
             }
         }
