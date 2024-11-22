@@ -6,7 +6,7 @@ pipeline {
        maven 'maven-3.9'
   }
   environment {
-        IMAGE_NAME = 'vgevorgyan009/demo-app:java-maven-6.0'
+        IMAGE_NAME = 'vgevorgyan009/demo-app:java-maven-7.0'
   }
   stages {
     stage("init") {
@@ -35,14 +35,16 @@ pipeline {
         steps {
             script {
                 echo "Deploying docker image to EC2..."
-                def shellCmd = "bash ./server-cmds.sh"
+                def shellCmd = "bash ./server-cmds.sh ${IMAGE_NAME}"
+                def ec2Instance = "ec2-user@13.50.16.143"
                 sshagent(['ec2-server-key']) {
-                sh "scp server-cmds.sh ec2-user@13.50.16.143:/home/ec2-user"   
-                sh "scp docker-compose.yaml ec2-user@13.50.16.143:/home/ec2-user" 
-                sh "ssh -o StrictHostKeyChecking=no ec2-user@13.50.16.143 ${shellCmd}"
+                sh "scp server-cmds.sh ${ec2Instance}:/home/ec2-user"   
+                sh "scp docker-compose.yaml ${ec2Instance}:/home/ec2-user" 
+                sh "ssh -o StrictHostKeyChecking=no ${ec2Instance} ${shellCmd}"
                 }
             }
         } 
      } 
    }
 }
+
